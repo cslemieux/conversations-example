@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:NavigatorContent xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		  xmlns:s="library://ns.adobe.com/flex/spark" 
+		  xmlns:mx="library://ns.adobe.com/flex/mx" 
+		  implements="org.test.view.IView"
+		  label="{product.name}">
+	<fx:Metadata>
+		[Name("productView", scope="conversation", autoCreate="true")]
+	</fx:Metadata>
+		
+	<fx:Script>
+		<![CDATA[
+			import org.granite.tide.events.TideUIEvent;
+			import org.test.model.Product;
+			
+			[In] [Bindable]
+			public var product:Product;
+		]]>
+	</fx:Script>
+	
+	<s:Form>
+		<s:FormItem label="Name">
+			<s:TextInput text="@{product.name}"/>
+		</s:FormItem>
+		<s:FormItem label="Price">
+			<s:TextInput text="{product.price}"/>
+		</s:FormItem>
+		<s:FormItem>
+			<s:HGroup>
+				<s:Button label="Save" click="dispatchEvent(new TideUIEvent('saveProduct'))"/>
+				<s:Button label="Cancel" click="dispatchEvent(new TideUIEvent('cancelProduct'))"/>
+			</s:HGroup>
+		</s:FormItem>
+	</s:Form>
+</s:NavigatorContent>

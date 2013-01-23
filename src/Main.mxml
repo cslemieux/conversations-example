@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:m="org.test.model.*"
+			   minWidth="955" minHeight="600"
+			   preinitialize="Spring.getInstance().initApplication()"
+			   creationComplete="Spring.getInstance().getSpringContext().meta_mergeExternalData(productList)">
+	
+	<fx:Script>
+		<![CDATA[
+			import org.granite.tide.events.TideContextEvent;
+			import org.granite.tide.events.TideUIConversationEvent;
+			import org.granite.tide.spring.Spring;
+			import org.test.control.ProductController;
+			import org.test.view.IView;
+			import org.test.view.ProductView;
+			
+			// Declare the conversation-scoped view and controller 
+			Spring.getInstance().addComponents([ ProductView, ProductController ]);
+			
+			// Dispatch a conversation start event
+			// First argument is the conversation id
+			// Second argument is the event type
+			private function openProduct(product:Product):void {
+				dispatchEvent(new TideUIConversationEvent("product#" + product.pid, "openProduct", product));
+			}
+			
+			// Generic observer that will add the current conversation view to the tab navigator
+			// when the conversation is created
+			[Observer("org.granite.tide.contextCreate")]
+			public function contextCreate(event:TideContextEvent):void {
+				var view:IView = event.context.byType(IView, true) as IView;
+				viewStack.addElement(view);
+				tabBar.selectedItem = view;
+			}
+			
+			// Generic observer that will remove the view from the tab navigator
+			// when the conversation is ended
+			[Observer("org.granite.tide.contextDestroy")]
+			public function contextDestroy(event:TideContextEvent):void {
+				var view:IView = event.context.byType(IView) as IView;
+				viewStack.removeElement(view);
+			}
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<s:ArrayCollection id="productList">
+			<m:Product pid="1" uid="P1" name="Product 1" price="10000.0"/>
+			<m:Product pid="2" uid="P2" name="Product 2" price="20000.0"/>
+			<m:Product pid="3" uid="P3" name="Product 3" price="14000.0"/>
+		</s:ArrayCollection>
+	</fx:Declarations>
+	
+	<s:VGroup>
+		<s:TabBar id="tabBar" dataProvider="{viewStack}"/>
+		
+		<mx:ViewStack id="viewStack" borderStyle="solid" width="100%">		
+			<s:NavigatorContent id="list" label="List">
+				<s:Label text="List"/>
+				
+				<s:DataGrid id="dataGrid" dataProvider="{productList}" 
+							selectionChange="openProduct(dataGrid.selectedItem as Product)"/>
+			</s:NavigatorContent>
+		</mx:ViewStack>		
+	</s:VGroup>
+</s:Application>
